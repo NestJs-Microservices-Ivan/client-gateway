@@ -8,15 +8,15 @@ import { envVariable } from 'src/config/env';
 @Module({
   controllers: [ProductsController],
   imports:[
-  ClientsModule.register([
-    { 
-      name:PRODUCT_SERVICES,
-      transport: Transport.TCP,
-      options:{
-        host:envVariable.productMicroserviceHost,
-        port:envVariable.productMicroservicePort
+    ClientsModule.register([
+      {
+        name: PRODUCT_SERVICES,
+        transport: Transport.TCP,
+        options:{
+          host: envVariable.productMicroserviceHost,
+          port: envVariable.productMicroservicePort
+        }
       }
-    }
     ])
   ]
 })

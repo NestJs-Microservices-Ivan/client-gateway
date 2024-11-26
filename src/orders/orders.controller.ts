@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { OrdersService } from './orders.service';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { ORDERS_SERVICES } from 'src/config/services';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    @Inject(ORDERS_SERVICES) private readonly clientOrders: ClientProxy
+  ) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+    return this.clientOrders.send('createOrder',createOrderDto);
   }
 
   @Get()
   findAll() {
-    return this.ordersService.findAll();
+    return this.clientOrders.send('findAllOrders',{});
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.clientOrders.send('findOneOrder',id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
-  }
 }

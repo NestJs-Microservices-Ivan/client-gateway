@@ -1,8 +1,9 @@
-import { IsNumber, IsPositive, IsString, MinLength } from "class-validator";
+import { IsNumber, IsPositive, IsString, Min, MinLength } from "class-validator";
 
 import { Type } from "class-transformer";
 
-export class CreateProductDto{
+export class CreateProductDto {
+
     id:number
     
     @IsString()
@@ -13,4 +14,6 @@ export class CreateProductDto{
     @IsPositive()
     @Type(() => Number)
     price:number;
+
+
 }
