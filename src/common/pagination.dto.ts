@@ -7,10 +7,10 @@ export class Pagination{
     @IsNumber()
     @IsPositive()
     @Type(() => Number)
-    skip?: number
+    skip?: number = 1
 
     @IsNumber()
     @IsPositive()
     @Type(() => Number)
-    take?: number
+    take?: number = 10
 }

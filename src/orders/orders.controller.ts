@@ -1,7 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, ParseUUIDPipe, Query } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ORDERS_SERVICES } from 'src/config/services';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { catchError } from 'rxjs';
+import { Pagination } from 'src/common/pagination.dto';
+import { OrderPaginationDto } from './dto/order-pagination.dto';
+import { Status } from './dto/status.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -11,17 +15,35 @@ export class OrdersController {
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    return this.clientOrders.send('createOrder',createOrderDto);
+    return this.clientOrders.send('createOrder',createOrderDto)
+    .pipe(catchError((err) => {throw new RpcException(err)}));
   }
 
   @Get()
-  findAll() {
-    return this.clientOrders.send('findAllOrders',{});
+  findAll(@Query() paginationDto:OrderPaginationDto) {
+    return this.clientOrders.send('findAllOrders',paginationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.clientOrders.send('findOneOrder',id);
+  @Get('id/:id')
+  findOneById(@Param('id',ParseUUIDPipe) id: string) {
+    return this.clientOrders.send('findOneOrder',{id})
+    .pipe(
+      catchError((err) => {throw new RpcException(err)})
+    );
+  }
+
+  @Get(':status')
+  findOneByStatus(
+    @Param() statusDto: Status,
+    @Query() paginationDto: Pagination
+  ) {
+    return this.clientOrders.send('findAllOrders',{
+      ...paginationDto,
+      status: statusDto.status
+    })
+    .pipe(
+      catchError((err) => {throw new RpcException(err)})
+    );
   }
 
 
