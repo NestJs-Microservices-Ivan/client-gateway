@@ -1,7 +1,7 @@
 import { IsEnum, IsOptional } from "class-validator";
 import { orderStatus, orderStatusList } from "../enum/orderStauts.enum";
 
-export class Status{
+export class StatusDto{
     @IsOptional()
     @IsEnum(
         orderStatusList,

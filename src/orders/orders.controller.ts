@@ -5,7 +5,7 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
 import { Pagination } from 'src/common/pagination.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
-import { Status } from './dto/status.dto';
+import { StatusDto } from './dto/status.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -34,7 +34,7 @@ export class OrdersController {
 
   @Get(':status')
   findOneByStatus(
-    @Param() statusDto: Status,
+    @Param() statusDto: StatusDto,
     @Query() paginationDto: Pagination
   ) {
     return this.clientOrders.send('findAllOrders',{
@@ -44,6 +44,17 @@ export class OrdersController {
     .pipe(
       catchError((err) => {throw new RpcException(err)})
     );
+  }
+
+  @Patch(':id')
+  changeOrderStatus(
+    @Param('id',ParseUUIDPipe) id:string,
+    @Body() statusDto: StatusDto
+  ){
+    return this.clientOrders.send('changeStatus',{
+      id,
+      status:statusDto.status
+    })
   }
 
 
